@@ -1,7 +1,7 @@
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
 
 void main() {
   runApp(MyApp());
@@ -16,7 +16,11 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      onGenerateTitle: (BuildContext context)=>AppLocalizations.of(context)!.title,
+      onGenerateTitle: (BuildContext context) =>
+          AppLocalizations.of(context)!.title,
+      themeMode: ThemeMode.system,
+      darkTheme: FlexColorScheme.dark(scheme: FlexScheme.indigo).toTheme,
+      theme: FlexColorScheme.light(scheme: FlexScheme.indigo).toTheme,
       home: Container(),
     );
   }

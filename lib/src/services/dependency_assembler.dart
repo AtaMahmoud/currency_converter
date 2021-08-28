@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 
+import '../business_logic/view_models/currency_exchange_view_model.dart';
 import './storage/storage_service.dart';
 import './storage/shared_prefernces_storage.dart';
 import './web_api/coingecko_web_api.dart';
@@ -15,4 +16,6 @@ void setupDependencyAssembler() {
       .registerFactory<StorageService>(() => SharedPreferncesStorage());
   dependencyAssmbler
       .registerFactory<CurrencyService>(() => CurrencyServiceImplementation());
+  dependencyAssmbler.registerFactory<CurrencyExchangeViewModel>(
+      () => CurrencyExchangeViewModel());
 }

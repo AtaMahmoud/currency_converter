@@ -1,3 +1,4 @@
+import '../../utils/constants.dart';
 import '../../business_logic/models/rate.dart';
 import './currency_service.dart';
 import '../dependency_assembler.dart';
@@ -28,7 +29,6 @@ class CurrencyServiceImplementation implements CurrencyService {
   }
 
   Future<bool> _isValidCachedRate() async {
-    const int _fetchTimePeriodInMinutes = 1;
     final rate = await _storageService.getExchangeRate();
 
     if (rate == null) return false;
@@ -36,6 +36,6 @@ class CurrencyServiceImplementation implements CurrencyService {
     final rateFetchTime = DateTime.fromMillisecondsSinceEpoch(rate.fetchTime);
     Duration difference = DateTime.now().difference(rateFetchTime);
 
-    return difference.inMinutes < _fetchTimePeriodInMinutes;
+    return difference.inMinutes < fetchPeriodInMinutes;
   }
 }

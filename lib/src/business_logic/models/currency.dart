@@ -19,4 +19,13 @@ class Currency {
     if (amount == null) return "";
     return amount.toString();
   }
+
+  Currency copyWithNew({double? amount}) {
+    return Currency(
+        iconPath: iconPath,
+        isoName: isoName,
+        symbol: symbol,
+        exchangeRate: exchangeRate,
+        amount: amount);
+  }
 }

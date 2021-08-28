@@ -1,0 +1,23 @@
+{
+    "title": "Currency Converter",
+    "@title": {
+      "description": "Application title"
+    },
+    "baseAmount": "Base Amount",
+    "@baseAmount": {
+      "description": ""
+    },
+    "convertedAmount": "Converted Amount",
+    "@convertedAmount": {
+      "description": ""
+    },
+    "switch": "Switch",
+    "@switch": {
+      "description": ""
+    },
+    "lastUpdateAt": "Last update at",
+    "@lastUpdateAt": {
+      "description": ""
+    }
+
+}

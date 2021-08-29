@@ -8,12 +8,13 @@ import '../../services/currency/currency_service.dart';
 import '../../utils/assets_paths.dart';
 import '../models/currency.dart';
 import '../models/rate.dart';
+import '../models/failure.dart';
 
 class CurrencyExchangeViewModel {
   final int _maxBtcAmount = 350;
 
   final rateNotifier = ValueNotifier<Rate?>(null);
-  final failure = ValueNotifier<String>("");
+  final failure = ValueNotifier<Failure?>(null);
   final viewStaeNotifier = ValueNotifier<ViewState>(ViewState.idle);
 
   final baseCurrency = ValueNotifier<Currency>(
@@ -115,13 +116,18 @@ class CurrencyExchangeViewModel {
 
     int? timeLeft;
     if (consumedMinutes != 0) timeLeft = fetchPeriodInMinutes - consumedMinutes;
-    return timeLeft;
+    return timeLeft != null && timeLeft < 0 ? null : timeLeft;
   }
 
   Future<void> _updateExchangeRate() async {
     viewStaeNotifier.value = ViewState.busy;
-    rateNotifier.value = await _currencyService.getExchangeRate();
-    _initCurrenciesRates();
+    try {
+      rateNotifier.value = await _currencyService.getExchangeRate();
+      _initCurrenciesRates();
+      failure.value = null;
+    } catch (e) {
+      failure.value = e as Failure;
+    }
     viewStaeNotifier.value = ViewState.idle;
   }
 

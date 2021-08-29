@@ -71,7 +71,7 @@ class CurrencyExchangeViewModel {
     final newAmount = updatedAmount * convertedCurrency.value.exchangeRate!;
 
     _updateBaseCurrencyAmount(newAmount);
-   // _adjustBtcAmount();
+    // _adjustBtcAmount();
   }
 
   void _updateBaseCurrencyAmount(double? newAmount) {
@@ -96,8 +96,26 @@ class CurrencyExchangeViewModel {
 
   Future<void> initRateState() async {
     await _updateExchangeRate();
-    _timer = Timer.periodic(const Duration(minutes: fetchPeriodInMinutes),
-        (_) => _updateExchangeRate());
+    int? timeLeft = _getCacheLeftTime();
+
+    _timer = Timer.periodic(Duration(minutes: timeLeft ?? fetchPeriodInMinutes),
+        (_) async {
+      timeLeft = null;
+      await _updateExchangeRate();
+    });
+  }
+
+  /// Get cached rate left time to expire
+  /// if [consumedMinutes] equals zero this means it's fresh fetched rate
+  int? _getCacheLeftTime() {
+    int consumedMinutes = DateTime.now()
+        .difference(
+            DateTime.fromMillisecondsSinceEpoch(rateNotifier.value!.fetchTime))
+        .inMinutes;
+
+    int? timeLeft;
+    if (consumedMinutes != 0) timeLeft = fetchPeriodInMinutes - consumedMinutes;
+    return timeLeft;
   }
 
   Future<void> _updateExchangeRate() async {

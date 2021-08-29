@@ -48,7 +48,7 @@ class CurrencyExchangeViewModel {
     }
 
     double updatedAmount = double.parse(value);
-
+    baseCurrency.value.amount = updatedAmount;
     final newAmount = updatedAmount * baseCurrency.value.exchangeRate!;
 
     _updateConvertedCurrencyAmount(newAmount);
@@ -68,7 +68,7 @@ class CurrencyExchangeViewModel {
       return;
     }
     double updatedAmount = double.parse(value);
-
+    convertedCurrency.value.amount = updatedAmount;
     final newAmount = updatedAmount * convertedCurrency.value.exchangeRate!;
 
     _updateBaseCurrencyAmount(newAmount);

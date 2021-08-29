@@ -51,7 +51,7 @@ class CurrencyExchangeViewModel {
     final newAmount = updatedAmount * baseCurrency.value.exchangeRate!;
 
     _updateConvertedCurrencyAmount(newAmount);
-    _adjustBtcAmount();
+    //_adjustBtcAmount();
   }
 
   void _updateConvertedCurrencyAmount(double? newAmount) {
@@ -71,7 +71,7 @@ class CurrencyExchangeViewModel {
     final newAmount = updatedAmount * convertedCurrency.value.exchangeRate!;
 
     _updateBaseCurrencyAmount(newAmount);
-    _adjustBtcAmount();
+   // _adjustBtcAmount();
   }
 
   void _updateBaseCurrencyAmount(double? newAmount) {

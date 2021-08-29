@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// Signature of the custom builder method definition
@@ -10,7 +9,7 @@ typedef ResponsiveBuilder = Widget Function(
 
 /// widget to get the [size] of the available space inside the [SafeAra],
 /// down to its children
-/// disable the [bottom] padding for iOS devices
+/// disable the [bottom] padding for iOS devices to avoid home button padding
 class ResponsiveSafeArea extends StatelessWidget {
   const ResponsiveSafeArea({
     required ResponsiveBuilder builder,
@@ -23,7 +22,7 @@ class ResponsiveSafeArea extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      bottom: !Platform.isIOS,
+      bottom:!(defaultTargetPlatform == TargetPlatform.iOS),
       child: LayoutBuilder(
         builder: (context, constraints) {
           return responsiveBuilder(

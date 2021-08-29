@@ -11,7 +11,7 @@ import '../models/rate.dart';
 import '../models/failure.dart';
 
 class CurrencyExchangeViewModel {
-  final int _maxBtcAmount = 350;
+  final double _maxBtcAmount = 500;
 
   final rateNotifier = ValueNotifier<Rate?>(null);
   final failure = ValueNotifier<Failure?>(null);
@@ -33,56 +33,62 @@ class CurrencyExchangeViewModel {
       viewStaeNotifier.value != ViewState.busy &&
       (failure.value == null || rateNotifier.value != null);
 
-  void _adjustBtcAmount() {
+  bool _isBtcAmountExceedMaxBtcAmount() {
     double btcAmount = baseCurrency.value.symbol == "BTC"
         ? baseCurrency.value.amount!
         : convertedCurrency.value.amount!;
 
-    if (btcAmount <= _maxBtcAmount) return;
-
-    baseCurrency.value.symbol == "BTC"
-        ? baseCurrencyAmount(baseCurrency.value.currentAmount)
-        : convertedCurrencyAmount(convertedCurrency.value.currentAmount);
+    return btcAmount <= _maxBtcAmount;
   }
 
-  void baseCurrencyAmount(String value) {
+  void _adjustBtcAmount() {
+    if (_isBtcAmountExceedMaxBtcAmount()) return;
+
+    double usdAmount = rateNotifier.value!.exchangeRate * _maxBtcAmount;
+
+    if (baseCurrency.value.symbol == "BTC") {
+      _updateCurrencyAmount(baseCurrency, _maxBtcAmount);
+      _updateCurrencyAmount(convertedCurrency, usdAmount);
+    } else {
+      _updateCurrencyAmount(baseCurrency, usdAmount);
+      _updateCurrencyAmount(convertedCurrency, _maxBtcAmount);
+    }
+  }
+
+  void updateBaseCurrencyAmount(String value) {
     if (value.isEmpty) {
-      _updateConvertedCurrencyAmount(null);
+      _updateCurrencyAmount(convertedCurrency, null);
       return;
     }
 
-    double updatedAmount = double.parse(value);
-    baseCurrency.value.amount = updatedAmount;
-    final newAmount = updatedAmount * baseCurrency.value.exchangeRate!;
+    final newAmount = _exchangeCurrency(baseCurrency, value);
 
-    _updateConvertedCurrencyAmount(newAmount);
-    //_adjustBtcAmount();
+    _updateCurrencyAmount(convertedCurrency, newAmount);
+    _adjustBtcAmount();
   }
 
-  void _updateConvertedCurrencyAmount(double? newAmount) {
-    final updatedCurrency =
-        convertedCurrency.value.copyWithNew(amount: newAmount);
-
-    convertedCurrency.value = updatedCurrency;
+  double _exchangeCurrency(ValueNotifier currency, String amount) {
+    double updatedAmount = double.parse(amount);
+    currency.value.amount = updatedAmount;
+    return updatedAmount * currency.value.exchangeRate!;
   }
 
-  void convertedCurrencyAmount(String value) {
+  void _updateCurrencyAmount(ValueNotifier currency, double? newAmount) {
+    final updatedCurrency = currency.value.copyWithNew(amount: newAmount);
+
+    currency.value = updatedCurrency;
+  }
+
+  void updateConvertedCurrencyAmount(String value) {
     if (value.isEmpty) {
-      _updateBaseCurrencyAmount(null);
+      _updateCurrencyAmount(baseCurrency, null);
       return;
     }
-    double updatedAmount = double.parse(value);
-    convertedCurrency.value.amount = updatedAmount;
-    final newAmount = updatedAmount * convertedCurrency.value.exchangeRate!;
 
-    _updateBaseCurrencyAmount(newAmount);
-    // _adjustBtcAmount();
-  }
+    final newAmount = _exchangeCurrency(convertedCurrency, value);
 
-  void _updateBaseCurrencyAmount(double? newAmount) {
-    final updatedCurrency = baseCurrency.value.copyWithNew(amount: newAmount);
-
-    baseCurrency.value = updatedCurrency;
+    _updateCurrencyAmount(baseCurrency, newAmount);
+    _adjustBtcAmount();
   }
 
   void _initCurrenciesRates() {
@@ -114,7 +120,7 @@ class CurrencyExchangeViewModel {
   /// if [consumedMinutes] equals zero this means it's fresh fetched rate
   int? _getCacheLeftTime() {
     if (rateNotifier.value == null) return null;
-    
+
     int consumedMinutes = DateTime.now()
         .difference(
             DateTime.fromMillisecondsSinceEpoch(rateNotifier.value!.fetchTime))

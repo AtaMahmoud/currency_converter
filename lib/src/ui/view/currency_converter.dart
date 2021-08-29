@@ -77,7 +77,7 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
                           isEnabled: _currencyExchangeViewModel.isEnabled(),
                           controller: baseCurrencyTextEditController,
                           onChange:
-                              _currencyExchangeViewModel.baseCurrencyAmount,
+                              _currencyExchangeViewModel.updateBaseCurrencyAmount,
                         );
                       },
                     ),
@@ -100,7 +100,7 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
                           isEnabled: _currencyExchangeViewModel.isEnabled(),
                           controller: convertedCurrencyTextEditController,
                           onChange: _currencyExchangeViewModel
-                              .convertedCurrencyAmount,
+                              .updateConvertedCurrencyAmount,
                         );
                       },
                     ),

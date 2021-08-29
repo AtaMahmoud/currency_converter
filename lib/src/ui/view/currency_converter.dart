@@ -33,6 +33,7 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
     super.dispose();
   }
 
+  bool _isLargeScreen(Size size) => size.shortestSide >= 550;
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
@@ -48,65 +49,74 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
       body: ResponsiveSafeArea(builder: (context, size) {
         return GestureDetector(
           onTap: FocusManager.instance.primaryFocus?.unfocus,
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 20),
-                  const Label(text: "Principal Amount"),
-                  ValueListenableBuilder<Currency>(
-                      valueListenable: _currencyExchangeViewModel.baseCurrency,
-                      builder: (context, Currency currency, child) {
-                        baseCurrencyTextEditController.text =
-                            currency.currentAmount;
-                        return CurrencyInputField(
-                          currency: currency,
-                          controller: baseCurrencyTextEditController,
-                          onChange:
-                              _currencyExchangeViewModel.baseCurrencyAmount,
-                        );
-                      }),
-                  Align(
-                      alignment: Alignment.centerRight,
-                      child: OutlinedButton.icon(
-                          onPressed: _currencyExchangeViewModel.swapCurrencies,
-                          icon: const Icon(Icons.swap_vert),
-                          label: const Text("Switch"))),
-                  const Label(text: "Converted Amount"),
-                  ValueListenableBuilder<Currency>(
-                      valueListenable:
-                          _currencyExchangeViewModel.convertedCurrency,
-                      builder: (context, Currency currency, child) {
-                        convertedCurrencyTextEditController.text =
-                            currency.currentAmount;
-                        return CurrencyInputField(
-                          currency: currency,
-                          controller: convertedCurrencyTextEditController,
-                          onChange: _currencyExchangeViewModel
-                              .convertedCurrencyAmount,
-                        );
-                      }),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  ValueListenableBuilder(
-                      valueListenable: _currencyExchangeViewModel.rateNotifier,
-                      builder: (context, viewState, child) {
-                        if (_currencyExchangeViewModel.viewStaeNotifier.value ==
-                            ViewState.busy) {
-                          return const Text("Fetching Exchange Rate...");
-                        } else {
-                          return BottomText(
-                            exchangeRate: _currencyExchangeViewModel
-                                .rateNotifier.value!.rate,
-                            lastUpdate: _currencyExchangeViewModel
-                                .rateNotifier.value!.time,
+          child: Center(
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              alignment: Alignment.topCenter,
+              width: _isLargeScreen(size) ? size.width * .5 : size.width * .95,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
+                    const Label(text: "Principal Amount"),
+                    ValueListenableBuilder<Currency>(
+                        valueListenable:
+                            _currencyExchangeViewModel.baseCurrency,
+                        builder: (context, Currency currency, child) {
+                          baseCurrencyTextEditController.text =
+                              currency.currentAmount;
+                          return CurrencyInputField(
+                            currency: currency,
+                            controller: baseCurrencyTextEditController,
+                            onChange:
+                                _currencyExchangeViewModel.baseCurrencyAmount,
                           );
-                        }
-                      }),
-                ],
+                        }),
+                    Align(
+                        alignment: Alignment.centerRight,
+                        child: OutlinedButton.icon(
+                            onPressed:
+                                _currencyExchangeViewModel.swapCurrencies,
+                            icon: const Icon(Icons.swap_vert),
+                            label: const Text("Switch"))),
+                    const Label(text: "Converted Amount"),
+                    ValueListenableBuilder<Currency>(
+                        valueListenable:
+                            _currencyExchangeViewModel.convertedCurrency,
+                        builder: (context, Currency currency, child) {
+                          convertedCurrencyTextEditController.text =
+                              currency.currentAmount;
+                          return CurrencyInputField(
+                            currency: currency,
+                            controller: convertedCurrencyTextEditController,
+                            onChange: _currencyExchangeViewModel
+                                .convertedCurrencyAmount,
+                          );
+                        }),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    ValueListenableBuilder(
+                        valueListenable:
+                            _currencyExchangeViewModel.rateNotifier,
+                        builder: (context, viewState, child) {
+                          if (_currencyExchangeViewModel
+                                  .viewStaeNotifier.value ==
+                              ViewState.busy) {
+                            return const Text("Fetching Exchange Rate...");
+                          } else {
+                            return BottomText(
+                              exchangeRate: _currencyExchangeViewModel
+                                  .rateNotifier.value!.rate,
+                              lastUpdate: _currencyExchangeViewModel
+                                  .rateNotifier.value!.time,
+                            );
+                          }
+                        }),
+                  ],
+                ),
               ),
             ),
           ),

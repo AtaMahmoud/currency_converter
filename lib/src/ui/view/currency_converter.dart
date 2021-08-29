@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import '../../utils/constants.dart';
 import '../../services/dependency_assembler.dart';
 import '../../business_logic/view_models/currency_exchange_view_model.dart';
@@ -37,12 +39,12 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
-
+    final appLocalizations = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          "Currency Converter",
+          appLocalizations.title,
           style: themeData.textTheme.headline6!.copyWith(color: Colors.white),
         ),
       ),
@@ -60,7 +62,7 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     const SizedBox(height: 20),
-                    const Label(text: "Principal Amount"),
+                    Label(text: appLocalizations.baseAmount),
                     ValueListenableBuilder<Currency>(
                         valueListenable:
                             _currencyExchangeViewModel.baseCurrency,
@@ -80,8 +82,8 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
                             onPressed:
                                 _currencyExchangeViewModel.swapCurrencies,
                             icon: const Icon(Icons.swap_vert),
-                            label: const Text("Switch"))),
-                    const Label(text: "Converted Amount"),
+                            label:  Text(appLocalizations.switchAmounts))),
+                    Label(text: appLocalizations.convertedAmount),
                     ValueListenableBuilder<Currency>(
                         valueListenable:
                             _currencyExchangeViewModel.convertedCurrency,
@@ -98,23 +100,25 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
                     const SizedBox(
                       height: 20,
                     ),
-                    ValueListenableBuilder(
-                        valueListenable:
-                            _currencyExchangeViewModel.rateNotifier,
-                        builder: (context, viewState, child) {
-                          if (_currencyExchangeViewModel
-                                  .viewStaeNotifier.value ==
-                              ViewState.busy) {
-                            return const Text("Fetching Exchange Rate...");
-                          } else {
-                            return BottomText(
-                              exchangeRate: _currencyExchangeViewModel
-                                  .rateNotifier.value!.rate,
-                              lastUpdate: _currencyExchangeViewModel
-                                  .rateNotifier.value!.time,
-                            );
-                          }
-                        }),
+                    Center(
+                      child: ValueListenableBuilder(
+                          valueListenable:
+                              _currencyExchangeViewModel.rateNotifier,
+                          builder: (context, viewState, child) {
+                            if (_currencyExchangeViewModel
+                                    .viewStaeNotifier.value ==
+                                ViewState.busy) {
+                              return  Text("${appLocalizations.fetchExchangeRate}...");
+                            } else {
+                              return BottomText(
+                                exchangeRate: _currencyExchangeViewModel
+                                    .rateNotifier.value!.rate,
+                                lastUpdate: _currencyExchangeViewModel
+                                    .rateNotifier.value!.time,
+                              );
+                            }
+                          }),
+                    ),
                   ],
                 ),
               ),

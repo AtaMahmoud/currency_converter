@@ -18,6 +18,10 @@
     "lastUpdateAt": "Last update at",
     "@lastUpdateAt": {
       "description": ""
+    },
+    "fetchExchangeRate": "Fetching Exchange Rate",
+    "@fetchExchangeRate": {
+      "description": ""
     }
 
 }

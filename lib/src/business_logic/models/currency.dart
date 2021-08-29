@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class Currency {
   final String symbol;
   final String isoName;
@@ -17,8 +19,15 @@ class Currency {
 
   String get currentAmount {
     if (amount == null) return "";
-    return amount.toString();
+
+    if (amount! < 1 && isoName == "BTC") return _formateAmount(amount!, 8);
+
+    return _formateAmount(amount!, 2);
   }
+
+  String _formateAmount(double amount, int decimalDigits) =>
+      NumberFormat.currency(symbol: symbol, decimalDigits: decimalDigits)
+          .format(amount);
 
   Currency copyWithNew({double? amount}) {
     return Currency(

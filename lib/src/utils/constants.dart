@@ -1,2 +1,2 @@
 const int fetchPeriodInMinutes = 10;
-const int amountFieldsMaxPrecision = 8;
+const int amountFieldsMaxPrecision = 14;

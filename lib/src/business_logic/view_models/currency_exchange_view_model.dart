@@ -21,7 +21,7 @@ class CurrencyExchangeViewModel {
       Currency(iconPath: usaFlag, isoName: "USD", symbol: "\$"));
 
   final convertedCurrency = ValueNotifier<Currency>(
-      Currency(iconPath: bitcoinLogo, isoName: "BTC", symbol: "₿"));
+      Currency(iconPath: bitcoinLogo, isoName: "BTC", symbol: "B"));
 
   void swapCurrencies() {
     final temp = baseCurrency.value;
@@ -60,16 +60,16 @@ class CurrencyExchangeViewModel {
       _updateCurrencyAmount(convertedCurrency, null);
       return;
     }
-
-    final newAmount = _exchangeCurrency(baseCurrency, value);
+    String newText = value.replaceAll(RegExp('[^0-9]'), '');
+    final newAmount = _exchangeCurrency(baseCurrency, newText);
 
     _updateCurrencyAmount(convertedCurrency, newAmount);
     _adjustBtcAmount();
   }
 
-  double _exchangeCurrency(ValueNotifier currency, String amount) {
+  double _exchangeCurrency(ValueNotifier<Currency> currency, String amount) {
     double updatedAmount = double.parse(amount);
-    currency.value.amount = updatedAmount;
+    currency.value = currency.value.copyWithNew(amount: updatedAmount);
     return updatedAmount * currency.value.exchangeRate!;
   }
 
@@ -85,7 +85,8 @@ class CurrencyExchangeViewModel {
       return;
     }
 
-    final newAmount = _exchangeCurrency(convertedCurrency, value);
+    String newText = value.replaceAll(RegExp('[^0-9]'), '');
+    final newAmount = _exchangeCurrency(convertedCurrency, newText);
 
     _updateCurrencyAmount(baseCurrency, newAmount);
     _adjustBtcAmount();

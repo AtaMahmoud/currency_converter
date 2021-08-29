@@ -1,19 +1,20 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+/// [ValueListenableBuilder] that listen to two [ValueNotifier]
 class ValueListenableBuilder2<A, B> extends StatelessWidget {
   const ValueListenableBuilder2(
       this.first,
       this.second, {
         Key? key,
         required this.builder,
-        required this.child,
+         this.child,
       }) : super(key: key);
 
   final ValueListenable<A> first;
   final ValueListenable<B> second;
-  final Widget child;
-  final Widget Function(BuildContext context, A a, B b, Widget child) builder;
+  final Widget? child;
+  final Widget Function(BuildContext context, A a, B b, Widget? child) builder;
 
   @override
   Widget build(BuildContext context) {

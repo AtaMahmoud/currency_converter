@@ -3,11 +3,14 @@ import 'package:flutter/services.dart';
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../../business_logic/models/failure.dart';
+import '../../business_logic/models/rate.dart';
 import '../../utils/constants.dart';
 import '../../services/dependency_assembler.dart';
 import '../../business_logic/view_models/currency_exchange_view_model.dart';
 import '../../business_logic/models/currency.dart';
 import '../shared/responsive_safe_area.dart';
+import '../shared/value_listenable_builder.dart';
 
 class CurrencyConverter extends StatefulWidget {
   const CurrencyConverter({Key? key}) : super(key: key);
@@ -63,61 +66,71 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
                   children: [
                     const SizedBox(height: 20),
                     Label(text: appLocalizations.baseAmount),
-                    ValueListenableBuilder<Currency>(
-                        valueListenable:
-                            _currencyExchangeViewModel.baseCurrency,
-                        builder: (context, Currency currency, child) {
-                          baseCurrencyTextEditController.text =
-                              currency.currentAmount;
-                          return CurrencyInputField(
-                            currency: currency,
-                            controller: baseCurrencyTextEditController,
-                            onChange:
-                                _currencyExchangeViewModel.baseCurrencyAmount,
-                          );
-                        }),
+                    ValueListenableBuilder2<Currency, ViewState>(
+                      _currencyExchangeViewModel.baseCurrency,
+                      _currencyExchangeViewModel.viewStaeNotifier,
+                      builder: (context, currency, viewState, child) {
+                        baseCurrencyTextEditController.text =
+                            currency.currentAmount;
+                        return CurrencyInputField(
+                          currency: currency,
+                          isEnabled: _currencyExchangeViewModel.isEnabled(),
+                          controller: baseCurrencyTextEditController,
+                          onChange:
+                              _currencyExchangeViewModel.baseCurrencyAmount,
+                        );
+                      },
+                    ),
                     Align(
                         alignment: Alignment.centerRight,
                         child: OutlinedButton.icon(
                             onPressed:
                                 _currencyExchangeViewModel.swapCurrencies,
                             icon: const Icon(Icons.swap_vert),
-                            label:  Text(appLocalizations.switchAmounts))),
+                            label: Text(appLocalizations.switchAmounts))),
                     Label(text: appLocalizations.convertedAmount),
-                    ValueListenableBuilder<Currency>(
-                        valueListenable:
-                            _currencyExchangeViewModel.convertedCurrency,
-                        builder: (context, Currency currency, child) {
-                          convertedCurrencyTextEditController.text =
-                              currency.currentAmount;
-                          return CurrencyInputField(
-                            currency: currency,
-                            controller: convertedCurrencyTextEditController,
-                            onChange: _currencyExchangeViewModel
-                                .convertedCurrencyAmount,
-                          );
-                        }),
+                    ValueListenableBuilder2<Currency, ViewState>(
+                      _currencyExchangeViewModel.convertedCurrency,
+                      _currencyExchangeViewModel.viewStaeNotifier,
+                      builder: (context, currency, viewState, child) {
+                        convertedCurrencyTextEditController.text =
+                            currency.currentAmount;
+                        return CurrencyInputField(
+                          currency: currency,
+                          isEnabled: _currencyExchangeViewModel.isEnabled(),
+                          controller: convertedCurrencyTextEditController,
+                          onChange: _currencyExchangeViewModel
+                              .convertedCurrencyAmount,
+                        );
+                      },
+                    ),
                     const SizedBox(
                       height: 20,
                     ),
                     Center(
-                      child: ValueListenableBuilder(
-                          valueListenable:
-                              _currencyExchangeViewModel.rateNotifier,
-                          builder: (context, viewState, child) {
-                            if (_currencyExchangeViewModel
-                                    .viewStaeNotifier.value ==
-                                ViewState.busy) {
-                              return  Text("${appLocalizations.fetchExchangeRate}...");
-                            } else {
-                              return BottomText(
-                                exchangeRate: _currencyExchangeViewModel
-                                    .rateNotifier.value!.rate,
-                                lastUpdate: _currencyExchangeViewModel
-                                    .rateNotifier.value!.time,
-                              );
+                      child: ValueListenableBuilder2<Rate?, Failure?>(
+                        _currencyExchangeViewModel.rateNotifier,
+                        _currencyExchangeViewModel.failure,
+                        builder: (context, rate, failure, child) {
+                          if (_currencyExchangeViewModel
+                                  .viewStaeNotifier.value ==
+                              ViewState.busy) {
+                            return Text(
+                                "${appLocalizations.fetchExchangeRate}...");
+                          } else {
+                            if (failure != null && rate == null) {
+                              return FailureLabel(failure: failure);
                             }
-                          }),
+
+                            return BottomText(
+                              exchangeRate: _currencyExchangeViewModel
+                                  .rateNotifier.value!.rate,
+                              lastUpdate: _currencyExchangeViewModel
+                                  .rateNotifier.value!.time,
+                            );
+                          }
+                        },
+                      ),
                     ),
                   ],
                 ),
@@ -127,6 +140,24 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
         );
       }),
     );
+  }
+}
+
+class FailureLabel extends StatelessWidget {
+  const FailureLabel({
+    Key? key,
+    required this.failure,
+  }) : super(key: key);
+
+  final Failure failure;
+
+  @override
+  Widget build(BuildContext context) {
+    final themeData = Theme.of(context);
+    return Text(failure.toString(),
+        style: themeData.textTheme.subtitle1!.copyWith(
+          color: themeData.errorColor,
+        ));
   }
 }
 
@@ -153,12 +184,14 @@ class CurrencyInputField extends StatefulWidget {
       {Key? key,
       required this.currency,
       required this.controller,
-      required this.onChange})
+      required this.onChange,
+      required this.isEnabled})
       : super(key: key);
 
   final Currency currency;
   final TextEditingController controller;
   final Function(String) onChange;
+  final bool isEnabled;
 
   @override
   _CurrencyInputFieldState createState() => _CurrencyInputFieldState();
@@ -211,6 +244,7 @@ class _CurrencyInputFieldState extends State<CurrencyInputField> {
           Expanded(
               child: TextField(
             focusNode: _foucsNode,
+            enabled: widget.isEnabled,
             maxLengthEnforcement: MaxLengthEnforcement.enforced,
             keyboardType: TextInputType.number,
             textAlign: TextAlign.end,
@@ -231,9 +265,11 @@ class BottomText extends StatelessWidget {
   final String lastUpdate;
   final String exchangeRate;
 
-  const BottomText(
-      {Key? key, required this.lastUpdate, required this.exchangeRate})
-      : super(key: key);
+  const BottomText({
+    Key? key,
+    required this.lastUpdate,
+    required this.exchangeRate,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -246,7 +282,7 @@ class BottomText extends StatelessWidget {
             "1 BTC = $exchangeRate USD",
             style: textStyle,
           ),
-          Text("Last update at $lastUpdate", style: textStyle)
+          Text("Last update at $lastUpdate", style: textStyle),
         ],
       ),
     );

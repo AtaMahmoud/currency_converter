@@ -29,6 +29,10 @@ class CurrencyExchangeViewModel {
     convertedCurrency.value = temp;
   }
 
+  bool isEnabled() =>
+      viewStaeNotifier.value != ViewState.busy &&
+      (failure.value == null || rateNotifier.value != null);
+
   void _adjustBtcAmount() {
     double btcAmount = baseCurrency.value.symbol == "BTC"
         ? baseCurrency.value.amount!
@@ -109,6 +113,8 @@ class CurrencyExchangeViewModel {
   /// Get cached rate left time to expire
   /// if [consumedMinutes] equals zero this means it's fresh fetched rate
   int? _getCacheLeftTime() {
+    if (rateNotifier.value == null) return null;
+    
     int consumedMinutes = DateTime.now()
         .difference(
             DateTime.fromMillisecondsSinceEpoch(rateNotifier.value!.fetchTime))

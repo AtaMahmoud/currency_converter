@@ -11,8 +11,8 @@
     "@convertedAmount": {
       "description": ""
     },
-    "switch": "Switch",
-    "@switch": {
+    "switchAmounts": "Switch",
+    "@switchAmounts": {
       "description": ""
     },
     "lastUpdateAt": "Last update at",

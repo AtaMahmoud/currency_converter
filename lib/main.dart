@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import './src/services/dependency_assembler.dart';
+import './src/ui/view/currency_converter.dart';
+import './themes/dark_theme.dart';
+import './themes/light_theme.dart';
 
 void main() {
   setupDependencyAssembler();
@@ -22,9 +25,9 @@ class MyApp extends StatelessWidget {
       onGenerateTitle: (BuildContext context) =>
           AppLocalizations.of(context)!.title,
       themeMode: ThemeMode.system,
-      darkTheme: FlexColorScheme.dark(scheme: FlexScheme.indigo).toTheme,
-      theme: FlexColorScheme.light(scheme: FlexScheme.indigo).toTheme,
-      home: Container(),
+      darkTheme: darkTheme,
+      theme: lightTheme,
+      home: const CurrencyConverter(),
     );
   }
 }

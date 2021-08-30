@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import './src/ui/view/currency_converter_page/currency_converter.dart';
 import './src/services/dependency_assembler.dart';
-import './src/ui/view/currency_converter.dart';
 import './themes/dark_theme.dart';
 import './themes/light_theme.dart';
 

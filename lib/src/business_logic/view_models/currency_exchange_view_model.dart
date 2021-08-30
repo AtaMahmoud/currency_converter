@@ -60,8 +60,8 @@ class CurrencyExchangeViewModel {
       _updateCurrencyAmount(convertedCurrency, null);
       return;
     }
-    String newText = value.replaceAll(RegExp('[^0-9]'), '');
-    final newAmount = _exchangeCurrency(baseCurrency, newText);
+    //String newText = value.replaceAll(RegExp('[^0-9]'), '');
+    final newAmount = _exchangeCurrency(baseCurrency, value);
 
     _updateCurrencyAmount(convertedCurrency, newAmount);
     _adjustBtcAmount();
@@ -85,8 +85,8 @@ class CurrencyExchangeViewModel {
       return;
     }
 
-    String newText = value.replaceAll(RegExp('[^0-9]'), '');
-    final newAmount = _exchangeCurrency(convertedCurrency, newText);
+    //String newText = value.replaceAll(RegExp('[^0-9]'), '');
+    final newAmount = _exchangeCurrency(convertedCurrency, value);
 
     _updateCurrencyAmount(baseCurrency, newAmount);
     _adjustBtcAmount();

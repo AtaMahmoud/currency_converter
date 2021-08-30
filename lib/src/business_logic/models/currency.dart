@@ -20,9 +20,9 @@ class Currency {
   String get currentAmount {
     if (amount == null) return "";
 
-    if (amount! < 1 && isoName == "BTC") return _formateAmount(amount!, 8);
+    if (amount! < 1 && isoName == "BTC") return amount!.toStringAsFixed(8);
 
-    return _formateAmount(amount!, 2);
+    return amount!.toStringAsFixed(2);
   }
 
   String _formateAmount(double amount, int decimalDigits) =>

@@ -29,7 +29,7 @@ class CurrencyExchangeViewModel {
     convertedCurrency.value = temp;
   }
 
-  bool isEnabled() =>
+  bool isTextFieldsEnabled() =>
       viewStaeNotifier.value != ViewState.busy &&
       (failure.value == null || rateNotifier.value != null);
 

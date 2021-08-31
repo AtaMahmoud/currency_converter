@@ -76,7 +76,7 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
             return CurrencyInputField(
               key: ValueKey(currency.isoName),
               currency: currency,
-              isEnabled: _currencyExchangeViewModel.isEnabled(),
+              isEnabled: _currencyExchangeViewModel.isTextFieldsEnabled(),
               controller: baseCurrencyTextEditController,
               onChange: _currencyExchangeViewModel.updateBaseCurrencyAmount,
             );
@@ -102,7 +102,7 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
             return CurrencyInputField(
               key: ValueKey(currency.isoName),
               currency: currency,
-              isEnabled: _currencyExchangeViewModel.isEnabled(),
+              isEnabled: _currencyExchangeViewModel.isTextFieldsEnabled(),
               controller: convertedCurrencyTextEditController,
               onChange:
                   _currencyExchangeViewModel.updateConvertedCurrencyAmount,
@@ -115,7 +115,7 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
 
   void _setTextEditControllerValue(
       Currency currency, TextEditingController controller) {
-    if (_currencyExchangeViewModel.isEnabled() && currency.amount != null) {
+    if (_currencyExchangeViewModel.isTextFieldsEnabled() && currency.amount != null) {
       final formattedAmount = currency.formattedAmount;
       controller.value = TextEditingValue(
           text: formattedAmount,

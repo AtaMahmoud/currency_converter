@@ -34,7 +34,7 @@ class CurrencyExchangeViewModel {
       (failure.value == null || rateNotifier.value != null);
 
   bool _isBtcAmountExceedMaxBtcAmount() {
-    double btcAmount = baseCurrency.value.symbol == "BTC"
+    double btcAmount = baseCurrency.value.isoName == "BTC"
         ? baseCurrency.value.amount!
         : convertedCurrency.value.amount!;
 
@@ -46,22 +46,32 @@ class CurrencyExchangeViewModel {
 
     double usdAmount = rateNotifier.value!.exchangeRate * _maxBtcAmount;
 
-    if (baseCurrency.value.symbol == "BTC") {
+    if (baseCurrency.value.isoName == "BTC") {
       _updateCurrencyAmount(baseCurrency, _maxBtcAmount);
       _updateCurrencyAmount(convertedCurrency, usdAmount);
     } else {
       _updateCurrencyAmount(baseCurrency, usdAmount);
       _updateCurrencyAmount(convertedCurrency, _maxBtcAmount);
     }
+
+    _notifiyCurrencyListner(baseCurrency);
+    _notifiyCurrencyListner(convertedCurrency);
+  }
+
+  void _notifiyCurrencyListner(ValueNotifier<Currency> currency) {
+    final currencyValue = currency.value;
+    currency.value = currencyValue.copyWithNew(amount: currencyValue.amount);
   }
 
   void updateBaseCurrencyAmount(String value) {
     if (value.isEmpty) {
       _updateCurrencyAmount(convertedCurrency, null);
+      _updateCurrencyAmount(baseCurrency, null);
       return;
     }
-    //String newText = value.replaceAll(RegExp('[^0-9]'), '');
-    final newAmount = _exchangeCurrency(baseCurrency, value);
+
+    final newAmount =
+        _exchangeCurrency(baseCurrency, _getAbsoluteAmount(value));
 
     _updateCurrencyAmount(convertedCurrency, newAmount);
     _adjustBtcAmount();
@@ -69,28 +79,29 @@ class CurrencyExchangeViewModel {
 
   double _exchangeCurrency(ValueNotifier<Currency> currency, String amount) {
     double updatedAmount = double.parse(amount);
-    currency.value = currency.value.copyWithNew(amount: updatedAmount);
+    currency.value.amount = updatedAmount;
     return updatedAmount * currency.value.exchangeRate!;
   }
 
-  void _updateCurrencyAmount(ValueNotifier currency, double? newAmount) {
-    final updatedCurrency = currency.value.copyWithNew(amount: newAmount);
-
-    currency.value = updatedCurrency;
-  }
+  void _updateCurrencyAmount(ValueNotifier currency, double? newAmount) =>
+      currency.value = currency.value.copyWithNew(amount: newAmount);
 
   void updateConvertedCurrencyAmount(String value) {
     if (value.isEmpty) {
       _updateCurrencyAmount(baseCurrency, null);
+      _updateCurrencyAmount(convertedCurrency, null);
       return;
     }
 
-    //String newText = value.replaceAll(RegExp('[^0-9]'), '');
-    final newAmount = _exchangeCurrency(convertedCurrency, value);
+    final newAmount =
+        _exchangeCurrency(convertedCurrency, _getAbsoluteAmount(value));
 
     _updateCurrencyAmount(baseCurrency, newAmount);
     _adjustBtcAmount();
   }
+
+  String _getAbsoluteAmount(String value) =>
+      value.substring(1).replaceAll(",", "");
 
   void _initCurrenciesRates() {
     final exchangeRate = rateNotifier.value!.exchangeRate;
@@ -106,7 +117,7 @@ class CurrencyExchangeViewModel {
   final _currencyService = dependencyAssmbler<CurrencyService>();
   Timer? _timer;
 
-  Future<void> initRateState() async {
+  Future<void> fetchExchangeRate() async {
     await _updateExchangeRate();
     int? timeLeft = _getCacheLeftTime();
 

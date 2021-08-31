@@ -5,6 +5,7 @@ import '../../../../business_logic/models/currency.dart';
 import '../../../../services/dependency_assembler.dart';
 import '../../../../business_logic/view_models/currency_exchange_view_model.dart';
 import '../../../../utils/constants.dart';
+import '../../../../utils/currency_input_formatter.dart';
 
 class CurrencyInputField extends StatefulWidget {
   const CurrencyInputField(
@@ -70,6 +71,7 @@ class _CurrencyInputFieldState extends State<CurrencyInputField> {
           ),
           Expanded(
               child: TextField(
+                key: widget.key,
             focusNode: _foucsNode,
             enabled: widget.isEnabled,
             maxLengthEnforcement: MaxLengthEnforcement.enforced,
@@ -77,10 +79,13 @@ class _CurrencyInputFieldState extends State<CurrencyInputField> {
             textAlign: TextAlign.end,
             controller: widget.controller,
             inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r"^(\d*\.)?\d+$")),
+              CurrencyInputFormatter(symbol: widget.currency.symbol),
+              FilteringTextInputFormatter.allow(RegExp(
+                  r"^[\$|B](\d{1,3},?(\d{3},?)*\d{3}(\.\d{1,3})?|\d{1,3}(\.\d{2})?)$")),
               LengthLimitingTextInputFormatter(amountFieldsMaxPrecision)
             ],
             onChanged: widget.onChange,
+        
           )),
         ],
       ),

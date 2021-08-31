@@ -17,17 +17,18 @@ class Currency {
   set currencyAmount(double amount) => amount = amount;
   set rate(double rate) => exchangeRate = rate;
 
-  String get currentAmount {
+  String get formattedAmount {
     if (amount == null) return "";
 
-    if (amount! < 1 && isoName == "BTC") return amount!.toStringAsFixed(8);
+    if (amount! < 1) return _formateAmount(amount!, 8);
 
-    return amount!.toStringAsFixed(2);
+    return _formateAmount(amount!, 2);
   }
 
-  String _formateAmount(double amount, int decimalDigits) =>
-      NumberFormat.currency(symbol: symbol, decimalDigits: decimalDigits)
-          .format(amount);
+  String _formateAmount(double amount, int decimalDigit) =>
+      NumberFormat.currency(symbol: symbol, decimalDigits: decimalDigit).format(
+        amount,
+      );
 
   Currency copyWithNew({double? amount}) {
     return Currency(

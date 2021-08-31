@@ -28,21 +28,42 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
   final convertedCurrencyTextEditController = TextEditingController();
   @override
   void initState() {
-    _currencyExchangeViewModel.initRateState();
+    _currencyExchangeViewModel.fetchExchangeRate();
+    _clearAnotherTextField(
+        baseCurrencyTextEditController, convertedCurrencyTextEditController);
+
+    _clearAnotherTextField(
+        convertedCurrencyTextEditController, baseCurrencyTextEditController);
+
     super.initState();
+  }
+
+  void _clearAnotherTextField(TextEditingController baseController,
+      TextEditingController convertedController) {
+    baseController.addListener(() {
+      if (baseController.text.isEmpty && convertedController.text.isNotEmpty) {
+        convertedController.clear();
+      }
+    });
   }
 
   @override
   void dispose() {
     _currencyExchangeViewModel.dispose();
+
+    baseCurrencyTextEditController.removeListener(() {});
     baseCurrencyTextEditController.dispose();
+
+    convertedCurrencyTextEditController.removeListener(() {});
     convertedCurrencyTextEditController.dispose();
+
     super.dispose();
   }
 
   Widget _buildBaseCurrencyInputField() {
     final appLocalizations = AppLocalizations.of(context)!;
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Label(text: appLocalizations.baseAmount),
         const SizedBox(height: 6),
@@ -50,8 +71,10 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
           _currencyExchangeViewModel.baseCurrency,
           _currencyExchangeViewModel.viewStaeNotifier,
           builder: (context, currency, viewState, child) {
-            baseCurrencyTextEditController.text = currency.currentAmount;
+            _setTextEditControllerValue(
+                currency, baseCurrencyTextEditController);
             return CurrencyInputField(
+              key: ValueKey(currency.isoName),
               currency: currency,
               isEnabled: _currencyExchangeViewModel.isEnabled(),
               controller: baseCurrencyTextEditController,
@@ -66,6 +89,7 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
   Widget _builConvertedCurrencyInputField() {
     final appLocalizations = AppLocalizations.of(context)!;
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Label(text: appLocalizations.convertedAmount),
         const SizedBox(height: 6),
@@ -73,8 +97,10 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
           _currencyExchangeViewModel.convertedCurrency,
           _currencyExchangeViewModel.viewStaeNotifier,
           builder: (context, currency, viewState, child) {
-            convertedCurrencyTextEditController.text = currency.currentAmount;
+            _setTextEditControllerValue(
+                currency, convertedCurrencyTextEditController);
             return CurrencyInputField(
+              key: ValueKey(currency.isoName),
               currency: currency,
               isEnabled: _currencyExchangeViewModel.isEnabled(),
               controller: convertedCurrencyTextEditController,
@@ -85,6 +111,16 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
         )
       ],
     );
+  }
+
+  void _setTextEditControllerValue(
+      Currency currency, TextEditingController controller) {
+    if (_currencyExchangeViewModel.isEnabled() && currency.amount != null) {
+      final formattedAmount = currency.formattedAmount;
+      controller.value = TextEditingValue(
+          text: formattedAmount,
+          selection: TextSelection.collapsed(offset: formattedAmount.length));
+    }
   }
 
   Widget _buildBottomSection() {
@@ -110,7 +146,7 @@ class _CurrencyConverterState extends State<CurrencyConverter> {
   }
 
   bool _isLargeScreen(Size size) => size.shortestSide >= 550;
-  
+
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);

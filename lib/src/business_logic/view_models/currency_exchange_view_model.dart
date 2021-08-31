@@ -41,7 +41,7 @@ class CurrencyExchangeViewModel {
     return btcAmount <= _maxBtcAmount;
   }
 
-  void _adjustBtcAmount() {
+  void _adjustBtcAmountIfRequired() {
     if (_isBtcAmountExceedMaxBtcAmount()) return;
 
     double usdAmount = rateNotifier.value!.exchangeRate * _maxBtcAmount;
@@ -74,7 +74,7 @@ class CurrencyExchangeViewModel {
         _exchangeCurrency(baseCurrency, _getAbsoluteAmount(value));
 
     _updateCurrencyAmount(convertedCurrency, newAmount);
-    _adjustBtcAmount();
+    _adjustBtcAmountIfRequired();
   }
 
   double _exchangeCurrency(ValueNotifier<Currency> currency, String amount) {
@@ -97,11 +97,14 @@ class CurrencyExchangeViewModel {
         _exchangeCurrency(convertedCurrency, _getAbsoluteAmount(value));
 
     _updateCurrencyAmount(baseCurrency, newAmount);
-    _adjustBtcAmount();
+    _adjustBtcAmountIfRequired();
   }
 
-  String _getAbsoluteAmount(String value) =>
-      value.substring(1).replaceAll(",", "");
+  String _getAbsoluteAmount(String value) {
+    final result = value.substring(1).replaceAll(",", "");
+    print(result);
+    return result;
+  }
 
   void _initCurrenciesRates() {
     final exchangeRate = rateNotifier.value!.exchangeRate;

@@ -1,6 +1,6 @@
 # USD/BTC Converter
 
-URL shorting mobile app using [coingecko](https://www.coingecko.com/en/api/documentation)
+USD/BTC converter app using [coingecko](https://www.coingecko.com/en/api/documentation)
 
 ## Development Environment
 

@@ -31,7 +31,8 @@ class CurrencyExchangeViewModel {
 
   bool isTextFieldsEnabled() =>
       viewStaeNotifier.value != ViewState.busy &&
-      (failure.value == null || rateNotifier.value != null);
+      rateNotifier.value != null &&
+      (failure.value == null || failure.value!.isNoInternet);
 
   bool _isBtcAmountExceedMaxBtcAmount() {
     double btcAmount = baseCurrency.value.isoName == "BTC"
@@ -100,11 +101,8 @@ class CurrencyExchangeViewModel {
     _adjustBtcAmountIfRequired();
   }
 
-  String _getAbsoluteAmount(String value) {
-    final result = value.substring(1).replaceAll(",", "");
-    print(result);
-    return result;
-  }
+  String _getAbsoluteAmount(String value) =>
+      value.substring(1).replaceAll(",", "");
 
   void _initCurrenciesRates() {
     final exchangeRate = rateNotifier.value!.exchangeRate;

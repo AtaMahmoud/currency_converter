@@ -16,7 +16,7 @@ Mobile UI                | Web UI
 
 After cloning this repository, perform the following steps before building your project.
 
-Get third party packages:
+Get packages:
 
 ```sh
 flutter pub get

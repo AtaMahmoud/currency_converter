@@ -71,7 +71,6 @@ class _CurrencyInputFieldState extends State<CurrencyInputField> {
           ),
           Expanded(
               child: TextField(
-                key: widget.key,
             focusNode: _foucsNode,
             enabled: widget.isEnabled,
             maxLengthEnforcement: MaxLengthEnforcement.enforced,
@@ -85,7 +84,6 @@ class _CurrencyInputFieldState extends State<CurrencyInputField> {
               LengthLimitingTextInputFormatter(amountFieldsMaxPrecision)
             ],
             onChanged: widget.onChange,
-        
           )),
         ],
       ),
